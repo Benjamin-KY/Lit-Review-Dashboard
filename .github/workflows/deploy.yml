@@ -23,11 +23,19 @@ jobs:
         cache: 'npm'
         
     - name: Install dependencies
-      run: npm install
-      
-    - name: Build
-      run: npm run build
-      
+      run: |
+        npm ci --prefer-offline --no-audit
+        
+    - name: Build TypeScript
+      run: |
+        npx tsc --noEmit
+        
+    - name: Build with Vite
+      run: |
+        npx vite build
+      env:
+        NODE_ENV: production
+        
     - name: Setup Pages
       uses: actions/configure-pages@v4
       
