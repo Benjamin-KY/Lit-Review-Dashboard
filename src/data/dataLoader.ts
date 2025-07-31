@@ -86,7 +86,7 @@ export function generateSampleData(): ProcessedData {
       venue: 'Blockchain Economics Journal'
     }
   ];
-  
+
   return transformDataForVisualization(samplePapers);
 }
 
@@ -100,7 +100,7 @@ export async function loadActualResearchData(): Promise<{
 }> {
   try {
     console.log('🔄 Loading research literature dataset...');
-    
+
     // PRIORITY 1: Load raw CSV data (we know this exists and has 600+ papers)
     let rawPapers: PaperRecord[] = [];
     try {
@@ -118,7 +118,7 @@ export async function loadActualResearchData(): Promise<{
       console.error('❌ Could not load CSV file:', csvError);
       throw csvError; // Don't continue if we can't load the main data
     }
-    
+
     // SECONDARY: Try to load screened dataset
     let screenedPapers: PaperRecord[] = [];
     try {
@@ -134,42 +134,42 @@ export async function loadActualResearchData(): Promise<{
     } catch (xlsxError) {
       console.warn('⚠️ Could not load screened dataset:', xlsxError);
     }
-    
+
     // Ensure we have data
     if (rawPapers.length === 0) {
       throw new Error('No papers could be loaded from raw dataset');
     }
-    
+
     // Process datasets
     const rawData = transformDataForVisualization(rawPapers);
-    const screenedData = screenedPapers.length > 0 ? 
-      transformDataForVisualization(screenedPapers) : 
+    const screenedData = screenedPapers.length > 0 ?
+      transformDataForVisualization(screenedPapers) :
       rawData; // Use raw data if no screened data
-    
+
     // Use screened data if available, otherwise raw data
     const combinedData = screenedPapers.length > 0 ? screenedData : rawData;
-    
-    const datasetType = screenedPapers.length > 0 ? 
-      'Systematically screened dataset' : 
+
+    const datasetType = screenedPapers.length > 0 ?
+      'Systematically screened dataset' :
       'Raw dataset';
-    
+
     console.log('🎉 SUCCESS: Research data loaded and ready!');
     console.log(`📊 Primary Dataset: ${datasetType}`);
     console.log(`📈 Papers: ${combinedData.papers.length}`);
     console.log(`👥 Authors: ${combinedData.authorNetwork.length}`);
     console.log(`🔗 Topics: ${combinedData.topicClusters.length}`);
     console.log(`📅 Year Range: ${combinedData.yearRange[0]}-${combinedData.yearRange[1]}`);
-    
+
     return {
       rawData,
       screenedData,
       combinedData
     };
-    
+
   } catch (error) {
     console.error('❌ Error loading research data:', error);
     console.log('🔄 Falling back to sample data for demonstration');
-    
+
     // Fallback to sample data if all else fails
     const sampleData = generateSampleData();
     return {
@@ -187,13 +187,13 @@ export async function loadCSVData(file: File): Promise<ProcessedData> {
   try {
     const csvContent = await readFileAsText(file);
     const papers = parseCSV(csvContent);
-    
+
     if (papers.length === 0) {
       throw new Error('No valid papers found in CSV file');
     }
-    
+
     console.log(`Successfully parsed ${papers.length} papers from CSV`);
-    
+
     return transformDataForVisualization(papers);
   } catch (error) {
     console.error('Error loading CSV data:', error);
@@ -210,16 +210,16 @@ export async function loadCSVFromURL(url: string): Promise<ProcessedData> {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const csvContent = await response.text();
     const papers = parseCSV(csvContent);
-    
+
     if (papers.length === 0) {
       throw new Error('No valid papers found in CSV file');
     }
-    
+
     console.log(`Successfully loaded ${papers.length} papers from URL`);
-    
+
     return transformDataForVisualization(papers);
   } catch (error) {
     console.error('Error loading CSV from URL:', error);
@@ -233,7 +233,7 @@ export async function loadCSVFromURL(url: string): Promise<ProcessedData> {
 function readFileAsText(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (event) => {
       const result = event.target?.result;
       if (typeof result === 'string') {
@@ -242,11 +242,11 @@ function readFileAsText(file: File): Promise<string> {
         reject(new Error('Failed to read file as text'));
       }
     };
-    
+
     reader.onerror = () => {
       reject(new Error('Error reading file'));
     };
-    
+
     reader.readAsText(file);
   });
 }
@@ -256,37 +256,37 @@ function readFileAsText(file: File): Promise<string> {
  */
 export function validateCSVStructure(csvContent: string): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
-  
+
   if (!csvContent || csvContent.trim().length === 0) {
     errors.push('CSV file is empty');
     return { valid: false, errors };
   }
-  
+
   const lines = csvContent.split('\n').filter(line => line.trim());
-  
+
   if (lines.length < 2) {
     errors.push('CSV file must have at least a header row and one data row');
     return { valid: false, errors };
   }
-  
+
   const headers = lines[0].toLowerCase();
   const requiredFields = ['title'];
   const recommendedFields = ['author', 'year', 'abstract'];
-  
+
   // Check for required fields
   for (const field of requiredFields) {
     if (!headers.includes(field)) {
       errors.push(`Missing required field: ${field}`);
     }
   }
-  
+
   // Check for recommended fields
   for (const field of recommendedFields) {
     if (!headers.includes(field)) {
       console.warn(`Missing recommended field: ${field}`);
     }
   }
-  
+
   return { valid: errors.length === 0, errors };
 }
 
