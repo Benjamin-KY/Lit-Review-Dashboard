@@ -105,7 +105,7 @@ export async function loadActualResearchData(): Promise<{
     let rawPapers: PaperRecord[] = [];
     try {
       console.log('📄 Loading raw CSV data...');
-      const rawResponse = await fetch('/raw-data.csv');
+      const rawResponse = await fetch('./raw-data.csv');
       if (rawResponse.ok) {
         const rawCsvContent = await rawResponse.text();
         console.log(`📋 CSV file loaded, size: ${rawCsvContent.length} characters`);
@@ -123,7 +123,7 @@ export async function loadActualResearchData(): Promise<{
     let screenedPapers: PaperRecord[] = [];
     try {
       console.log('📊 Attempting to load systematically screened dataset...');
-      const screenedResponse = await fetch('/screened-data.xlsx');
+      const screenedResponse = await fetch('./screened-data.xlsx');
       if (screenedResponse.ok) {
         const screenedBuffer = await screenedResponse.arrayBuffer();
         screenedPapers = await parseExcelFile(screenedBuffer);
