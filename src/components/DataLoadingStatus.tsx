@@ -14,8 +14,8 @@ export const DataLoadingStatus: React.FC<DataLoadingStatusProps> = ({ data, load
         <div className="flex items-center">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
           <div>
-            <h3 className="text-sm font-medium text-blue-900">Loading Your Research Data</h3>
-            <p className="text-sm text-blue-700">Processing your literature review dataset...</p>
+            <h3 className="text-sm font-medium text-blue-900">Loading Ben Kereopa-Yorke's Research Data</h3>
+            <p className="text-sm text-blue-700">Processing his literature review dataset...</p>
           </div>
         </div>
       </div>
@@ -44,12 +44,12 @@ export const DataLoadingStatus: React.FC<DataLoadingStatusProps> = ({ data, load
           <div className="flex items-center">
             <div className="text-green-600 mr-3">✅</div>
             <div>
-              <h3 className="text-sm font-medium text-green-900">🎯 Your FINAL SCREENED Dataset Loaded!</h3>
+              <h3 className="text-sm font-medium text-green-900">🎯 FINAL SCREENED Dataset Loaded!</h3>
               <p className="text-sm text-green-700">
                 {data.papers.length} papers • {data.authorNetwork.length} authors • {data.topicClusters.length} topics
               </p>
               <p className="text-xs text-green-600 mt-1">
-                Using the exact dataset from your literature review (XLSX)
+                Using the dataset from BKY's literature review (XLSX)
               </p>
             </div>
           </div>
