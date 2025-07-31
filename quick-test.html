@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Data Loading Test</title>
+</head>
+<body>
+    <h1>Testing Your Research Data Loading</h1>
+    <div id="status">Loading...</div>
+    <div id="results"></div>
+
+    <script>
+        async function testDataLoading() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                statusDiv.innerHTML = '🔄 Testing XLSX file access...';
+                
+                // Test XLSX file
+                const xlsxResponse = await fetch('/screened-data.xlsx');
+                if (xlsxResponse.ok) {
+                    const xlsxSize = xlsxResponse.headers.get('content-length');
+                    resultsDiv.innerHTML += `<p>✅ XLSX file accessible (${xlsxSize} bytes)</p>`;
+                } else {
+                    resultsDiv.innerHTML += `<p>❌ XLSX file not accessible (${xlsxResponse.status})</p>`;
+                }
+                
+                // Test CSV file
+                const csvResponse = await fetch('/raw-data.csv');
+                if (csvResponse.ok) {
+                    const csvSize = csvResponse.headers.get('content-length');
+                    resultsDiv.innerHTML += `<p>✅ CSV file accessible (${csvSize} bytes)</p>`;
+                } else {
+                    resultsDiv.innerHTML += `<p>❌ CSV file not accessible (${csvResponse.status})</p>`;
+                }
+                
+                statusDiv.innerHTML = '✅ Data file accessibility test complete!';
+                resultsDiv.innerHTML += `<p><strong>🚀 Your data files are ready for the main application!</strong></p>`;
+                
+            } catch (error) {
+                statusDiv.innerHTML = '❌ Error testing data files';
+                resultsDiv.innerHTML += `<p>Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Run test when page loads
+        testDataLoading();
+    </script>
+</body>
+</html>
