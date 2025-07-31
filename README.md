@@ -23,7 +23,7 @@ npm run build
 npm run preview
 ```
 
-## 🎯 Features
+## 🎯 Features 
 
 - **📊 Interactive Overview**: Animated metrics and quality indicators
 - **📈 Timeline Visualization**: 35-year research evolution with D3.js
