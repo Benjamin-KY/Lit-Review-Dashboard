@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: process.env.NODE_ENV === 'production' ? '/literature-review-showcase/' : '/',
+  base: process.env.NODE_ENV === 'production' ? '/Lit-Review-Dashboard/' : '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
