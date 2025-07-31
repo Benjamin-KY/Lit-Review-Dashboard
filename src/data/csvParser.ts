@@ -90,7 +90,7 @@ function createPaperRecord(headers: string[], fields: string[]): PaperRecord | n
     };
     
     const title = getField('title');
-    if (!title) return null; // Skip records without title
+    if (!title || title.length < 5) return null; // Skip records without meaningful title
     
     // Parse publication year with validation
     const yearStr = getField('year') || getField('date');

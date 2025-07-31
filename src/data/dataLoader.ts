@@ -101,68 +101,61 @@ export async function loadActualResearchData(): Promise<{
   try {
     console.log('🔄 Loading research literature dataset...');
     
-    // PRIORITY 1: Load screened dataset (systematically reviewed papers)
+    // PRIORITY 1: Load raw CSV data (we know this exists and has 600+ papers)
+    let rawPapers: PaperRecord[] = [];
+    try {
+      console.log('📄 Loading raw CSV data...');
+      const rawResponse = await fetch('/raw-data.csv');
+      if (rawResponse.ok) {
+        const rawCsvContent = await rawResponse.text();
+        console.log(`📋 CSV file loaded, size: ${rawCsvContent.length} characters`);
+        rawPapers = parseCSV(rawCsvContent);
+        console.log(`📋 Successfully parsed ${rawPapers.length} papers from raw dataset`);
+      } else {
+        throw new Error(`Raw CSV not accessible: ${rawResponse.status}`);
+      }
+    } catch (csvError) {
+      console.error('❌ Could not load CSV file:', csvError);
+      throw csvError; // Don't continue if we can't load the main data
+    }
+    
+    // SECONDARY: Try to load screened dataset
     let screenedPapers: PaperRecord[] = [];
     try {
-      console.log('📊 Loading systematically screened dataset...');
+      console.log('📊 Attempting to load systematically screened dataset...');
       const screenedResponse = await fetch('/screened-data.xlsx');
       if (screenedResponse.ok) {
         const screenedBuffer = await screenedResponse.arrayBuffer();
         screenedPapers = await parseExcelFile(screenedBuffer);
         console.log(`✅ Successfully loaded ${screenedPapers.length} papers from screened dataset`);
       } else {
-        throw new Error(`Screened dataset not accessible: ${screenedResponse.status}`);
+        console.warn(`⚠️ Screened dataset not accessible: ${screenedResponse.status}`);
       }
     } catch (xlsxError) {
       console.warn('⚠️ Could not load screened dataset:', xlsxError);
-      console.log('🔄 Attempting to load raw dataset...');
     }
     
-    // FALLBACK: Load raw CSV data if XLSX fails
-    let rawPapers: PaperRecord[] = [];
-    try {
-      console.log('📄 Loading raw CSV data as backup...');
-      const rawResponse = await fetch('/raw-data.csv');
-      if (rawResponse.ok) {
-        const rawCsvContent = await rawResponse.text();
-        rawPapers = parseCSV(rawCsvContent);
-        console.log(`📋 Loaded ${rawPapers.length} papers from raw dataset`);
-      }
-    } catch (csvError) {
-      console.warn('⚠️ Could not load CSV file:', csvError);
-    }
-    
-    // Determine primary dataset
-    let primaryPapers: PaperRecord[];
-    let datasetType: string;
-    
-    if (screenedPapers.length > 0) {
-      primaryPapers = screenedPapers;
-      datasetType = 'Systematically screened dataset';
-      console.log('✅ Using screened dataset as primary data source');
-    } else if (rawPapers.length > 0) {
-      primaryPapers = rawPapers;
-      datasetType = 'Raw dataset (fallback)';
-      console.log('📄 Using raw dataset as fallback data source');
-    } else {
-      throw new Error('No research data could be loaded from available sources');
+    // Ensure we have data
+    if (rawPapers.length === 0) {
+      throw new Error('No papers could be loaded from raw dataset');
     }
     
     // Process datasets
-    const rawData = rawPapers.length > 0 ? 
-      transformDataForVisualization(rawPapers) : 
-      transformDataForVisualization(primaryPapers);
-      
+    const rawData = transformDataForVisualization(rawPapers);
     const screenedData = screenedPapers.length > 0 ? 
       transformDataForVisualization(screenedPapers) : 
-      transformDataForVisualization(primaryPapers);
+      rawData; // Use raw data if no screened data
     
-    // Use the best available data as combined
+    // Use screened data if available, otherwise raw data
     const combinedData = screenedPapers.length > 0 ? screenedData : rawData;
+    
+    const datasetType = screenedPapers.length > 0 ? 
+      'Systematically screened dataset' : 
+      'Raw dataset';
     
     console.log('🎉 SUCCESS: Research data loaded and ready!');
     console.log(`📊 Primary Dataset: ${datasetType}`);
-    console.log(`📈 Papers: ${primaryPapers.length}`);
+    console.log(`📈 Papers: ${combinedData.papers.length}`);
     console.log(`👥 Authors: ${combinedData.authorNetwork.length}`);
     console.log(`🔗 Topics: ${combinedData.topicClusters.length}`);
     console.log(`📅 Year Range: ${combinedData.yearRange[0]}-${combinedData.yearRange[1]}`);
