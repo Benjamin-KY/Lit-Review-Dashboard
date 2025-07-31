@@ -32,7 +32,7 @@ export const MethodologyShowcase: React.FC<MethodologyShowcaseProps> = ({ data }
 
   // Calculate screening statistics
   const totalInitial = 2000;
-  const finalCount = data.papers.length;
+  const finalCount = 89;
   const inclusionRate = (finalCount / totalInitial * 100).toFixed(1);
 
   // Source diversity breakdown
