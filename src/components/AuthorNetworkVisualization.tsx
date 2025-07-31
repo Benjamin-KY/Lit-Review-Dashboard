@@ -116,7 +116,7 @@ export const AuthorNetworkVisualization: React.FC<AuthorNetworkVisualizationProp
       )
       .force('charge', d3.forceManyBody().strength(-100))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius(d => radiusScale(d.paperCount) + 2));
+      .force('collision', d3.forceCollide().radius(d => radiusScale((d as NetworkNode).paperCount) + 2));
 
     // Create container group
     const g = svg.append('g');
@@ -151,7 +151,7 @@ export const AuthorNetworkVisualization: React.FC<AuthorNetworkVisualizationProp
       .attr('r', d => radiusScale(d.paperCount))
       .attr('fill', d => {
         if (d.isProlific) return '#dc2626'; // red for prolific authors
-        return colorScale(d.primaryTopics[0] || 'Other');
+        return colorScale(d.primaryTopics[0] || 'Other') as string;
       })
       .attr('stroke', d => selectedAuthor === d.id ? '#1d4ed8' : '#fff')
       .attr('stroke-width', d => selectedAuthor === d.id ? 3 : 1.5)

@@ -1,4 +1,5 @@
-import { AuthorProfile, CollaborationEdge, AuthorCommunity } from './authorAnalysis';
+import { AuthorProfile, AuthorCommunity } from './authorAnalysis';
+import { CollaborationEdge } from '../types';
 
 /**
  * Utilities for author network visualization

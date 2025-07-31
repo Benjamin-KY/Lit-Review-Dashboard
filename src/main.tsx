@@ -4,7 +4,8 @@ import App from './App.tsx'
 import './index.css'
 
 // Import test runner for development
-if (import.meta.env.DEV) {
+// @ts-ignore
+if (import.meta.env?.DEV) {
   import('./testRunner');
 }
 
