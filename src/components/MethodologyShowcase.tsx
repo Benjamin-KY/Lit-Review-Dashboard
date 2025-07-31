@@ -20,10 +20,10 @@ export const MethodologyShowcase: React.FC<MethodologyShowcaseProps> = ({ data }
       { name: 'Excluded: Duplicates' }
     ],
     links: [
-      { source: 0, target: 1, value: 2500 },
-      { source: 1, target: 2, value: 1200 },
-      { source: 1, target: 5, value: 1300 },
-      { source: 2, target: 3, value: 800 },
+      { source: 0, target: 1, value: 2000 },
+      { source: 1, target: 2, value: 647 },
+      { source: 1, target: 5, value: 470 },
+      { source: 2, target: 3, value: 89 },
       { source: 2, target: 6, value: 400 },
       { source: 3, target: 4, value: 647 },
       { source: 3, target: 7, value: 153 }
