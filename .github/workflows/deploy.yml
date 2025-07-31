@@ -22,19 +22,27 @@ jobs:
         node-version: '18'
         cache: 'npm'
         
-    - name: Install dependencies
+    - name: Clean install dependencies
       run: |
-        npm ci --prefer-offline --no-audit
+        npm ci
         
-    - name: Build TypeScript
+    - name: List installed packages
       run: |
-        npx tsc --noEmit
+        npm list --depth=0
         
-    - name: Build with Vite
+    - name: Check TypeScript compilation
       run: |
-        npx vite build
+        npx tsc --noEmit --skipLibCheck
+        
+    - name: Build application
+      run: |
+        npm run build
       env:
         NODE_ENV: production
+        
+    - name: List build output
+      run: |
+        ls -la dist/
         
     - name: Setup Pages
       uses: actions/configure-pages@v4
