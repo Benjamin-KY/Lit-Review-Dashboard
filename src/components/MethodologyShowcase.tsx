@@ -31,7 +31,7 @@ export const MethodologyShowcase: React.FC<MethodologyShowcaseProps> = ({ data }
   };
 
   // Calculate screening statistics
-  const totalInitial = 2500;
+  const totalInitial = 2000;
   const finalCount = data.papers.length;
   const inclusionRate = (finalCount / totalInitial * 100).toFixed(1);
 
@@ -94,7 +94,7 @@ export const MethodologyShowcase: React.FC<MethodologyShowcaseProps> = ({ data }
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4">
             <div className="flex-1 text-center">
               <div className="bg-blue-100 border-2 border-blue-300 rounded-lg p-4 mb-2">
-                <div className="text-2xl font-bold text-blue-800">2,500+</div>
+                <div className="text-2xl font-bold text-blue-800">2,000</div>
                 <div className="text-sm text-blue-600">Initial Search Results</div>
               </div>
               <div className="text-xs text-gray-500">Database searches across multiple sources</div>
@@ -104,7 +104,7 @@ export const MethodologyShowcase: React.FC<MethodologyShowcaseProps> = ({ data }
             
             <div className="flex-1 text-center">
               <div className="bg-yellow-100 border-2 border-yellow-300 rounded-lg p-4 mb-2">
-                <div className="text-2xl font-bold text-yellow-800">1,200</div>
+                <div className="text-2xl font-bold text-yellow-800">647</div>
                 <div className="text-sm text-yellow-600">Title/Abstract Screen</div>
               </div>
               <div className="text-xs text-gray-500">Relevance filtering</div>
@@ -114,7 +114,7 @@ export const MethodologyShowcase: React.FC<MethodologyShowcaseProps> = ({ data }
             
             <div className="flex-1 text-center">
               <div className="bg-orange-100 border-2 border-orange-300 rounded-lg p-4 mb-2">
-                <div className="text-2xl font-bold text-orange-800">800</div>
+                <div className="text-2xl font-bold text-orange-800">470</div>
                 <div className="text-sm text-orange-600">Full-Text Review</div>
               </div>
               <div className="text-xs text-gray-500">Detailed assessment</div>
