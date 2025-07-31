@@ -7,47 +7,93 @@ import { analyzeAuthorNetwork } from '../utils/authorAnalysis';
  * Handles the 647-paper dataset with proper data cleaning and validation
  */
 export function parseCSV(csvContent: string): PaperRecord[] {
+  console.log('🔄 Starting CSV parsing...');
+  console.log(`📄 CSV content length: ${csvContent.length} characters`);
+  
   const lines = csvContent.split('\n');
-  const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+  console.log(`📋 Total lines in CSV: ${lines.length}`);
+  
+  if (lines.length < 2) {
+    console.error('❌ CSV file has insufficient lines');
+    return [];
+  }
+  
+  // Use a more robust CSV parsing approach
+  const headers = parseCSVLine(lines[0]).map(h => h.trim().replace(/"/g, ''));
+  console.log(`📊 Headers found: ${headers.length} columns`);
+  console.log(`📝 First few headers: ${headers.slice(0, 5).join(', ')}`);
   
   const papers: PaperRecord[] = [];
+  let validPapers = 0;
+  let skippedPapers = 0;
   
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line) continue;
     
-    // Parse CSV line handling quoted fields
-    const fields = parseCSVLine(line);
-    if (fields.length < headers.length) continue;
-    
-    const paper = createPaperRecord(headers, fields);
-    if (paper) {
-      papers.push(paper);
+    try {
+      // Parse CSV line handling quoted fields
+      const fields = parseCSVLine(line);
+      
+      // More lenient field count check
+      if (fields.length < headers.length * 0.5) {
+        skippedPapers++;
+        continue;
+      }
+      
+      const paper = createPaperRecord(headers, fields);
+      if (paper) {
+        papers.push(paper);
+        validPapers++;
+      } else {
+        skippedPapers++;
+      }
+    } catch (error) {
+      console.warn(`⚠️ Error parsing line ${i}:`, error);
+      skippedPapers++;
     }
   }
+  
+  console.log(`✅ CSV parsing complete:`);
+  console.log(`📈 Valid papers: ${validPapers}`);
+  console.log(`⚠️ Skipped papers: ${skippedPapers}`);
+  console.log(`📊 Total papers parsed: ${papers.length}`);
   
   return papers;
 }
 
 /**
  * Parse a single CSV line handling quoted fields and commas within quotes
+ * Enhanced to handle complex Zotero CSV format with nested quotes
  */
 function parseCSVLine(line: string): string[] {
   const fields: string[] = [];
   let current = '';
   let inQuotes = false;
+  let i = 0;
   
-  for (let i = 0; i < line.length; i++) {
+  while (i < line.length) {
     const char = line[i];
     
     if (char === '"') {
-      inQuotes = !inQuotes;
+      // Handle escaped quotes (double quotes)
+      if (i + 1 < line.length && line[i + 1] === '"') {
+        current += '"';
+        i += 2; // Skip both quotes
+        continue;
+      } else {
+        inQuotes = !inQuotes;
+      }
     } else if (char === ',' && !inQuotes) {
       fields.push(current.trim());
       current = '';
+      i++;
+      continue;
     } else {
       current += char;
     }
+    
+    i++;
   }
   
   fields.push(current.trim());
@@ -78,10 +124,12 @@ function createPaperRecord(headers: string[], fields: string[]): PaperRecord | n
       
       for (const possibleField of possibleFields) {
         const index = headers.findIndex(h => 
-          h.toLowerCase() === possibleField.toLowerCase() ||
-          h.toLowerCase().includes(possibleField.toLowerCase())
+          h && (
+            h.toLowerCase() === possibleField.toLowerCase() ||
+            h.toLowerCase().includes(possibleField.toLowerCase())
+          )
         );
-        if (index >= 0 && fields[index] && fields[index].trim()) {
+        if (index >= 0 && index < fields.length && fields[index] && fields[index].trim()) {
           return cleanField(fields[index]);
         }
       }
@@ -107,17 +155,17 @@ function createPaperRecord(headers: string[], fields: string[]): PaperRecord | n
     const tags = parseTags(combinedTagsStr);
     
     const paper: PaperRecord = {
-      key: getField('key') || generateKey(title, authors[0]),
+      key: getField('key') || generateKey(title, authors[0] || 'unknown'),
       itemType: getField('type') || getField('itemtype') || 'article',
       publicationYear,
-      authors,
+      authors: authors.length > 0 ? authors : ['Unknown Author'],
       title,
-      publicationTitle: getField('publication') || getField('journal') || getField('booktitle') || '',
+      publicationTitle: getField('venue') || getField('Publication Title') || '',
       doi: getField('doi'),
       url: getField('url'),
-      abstract: getField('abstract') || '',
+      abstract: getField('abstract'),
       tags,
-      venue: getField('venue') || getField('publication') || getField('journal') || ''
+      venue: getField('venue') || getField('Publication Title') || ''
     };
     
     return paper;
